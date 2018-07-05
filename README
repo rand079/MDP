@@ -1,0 +1,40 @@
+Code included is for the Metadata Drift Predictor described in 'Predicting concept drift in data streams using metadata clustering' and presented at IJCNN '18.
+This code requires MOA 2015.11 and Apache Commons Maths 3.*.
+
+To use:
+1) Create classifier, set up stream and select adaptable detector (with adaptation parameter a) to use for stream analysis.
+2) Create instance of MDP specifying drifts till adaption (dmin), # classes, # attributes, mode and metadata set to use.
+3) Pass every instance to learnDataDist method to record severity metadata
+4) When drift occurs, pass metadata to learnDriftState to cluster metadata
+5) When drift doesn't occur, predict chance of drift and adapt detector. If f parameter is used, this is where to implement it.
+
+Example code
+
+-- Set up adaptive detector (1)
+adaptiveADWIN dd_adwin = new adaptiveADWIN();
+dd_adwin.setAdaptRange(a);
+dd_adwin.prepareForUse();
+
+-- Instantiate MDP
+boolean[] metadata_to_use = {true, true, true, true, false};
+MetadataDriftPredictor driftPredictor = new MetadataDriftPredictor(250, stream.getNumClasses(), stream.getNumAttributes(), "Conservative", metadata_to_use);
+
+-- When running
+
+-- For every instance, track severity metadata
+driftPredictor.learnDataDist(inst);
+
+-- When drift occurs
+double currAcc = ((double)correct_classifications_since_last_drift)/((double)total_instances_since_last_drift);
+int interval = total_instances_since_last_drift;
+int warning = drift_detector.get_num_instances_that_detector_has_been_in_warning_state; //0 is fine if not using warning metadata
+driftPredictor.learnDriftState(currAcc, interval, warning);
+
+-- When drift doesn't occur
+if (total_instances % f == 0) {
+	double chanceOfDrift = driftPredictor.getDriftPrediction((currAcc, interval, warning);
+	dd_adwin.adaptConf(chanceOfDrift);
+}
+
+
+For any use apart from considering alongside papers for publication, please request permission from the author by emailing rand079@aucklanduni.ac.nz
