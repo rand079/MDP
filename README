@@ -16,7 +16,7 @@ dd_adwin.setAdaptRange(a);
 dd_adwin.prepareForUse();
 
 -- Instantiate MDP
-boolean[] metadata_to_use = {true, true, true, true, false};
+boolean[] metadata_to_use = {true, true, true, true, false}; //accuracy, volatility, response severity, predictor severity, warning
 MetadataDriftPredictor driftPredictor = new MetadataDriftPredictor(250, stream.getNumClasses(), stream.getNumAttributes(), "Conservative", metadata_to_use);
 
 -- When running
